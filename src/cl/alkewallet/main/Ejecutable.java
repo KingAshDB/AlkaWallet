@@ -1,73 +1,85 @@
 package cl.alkewallet.main;
 
 import java.util.Scanner;
-import java.util.Locale; // Importante para manejar puntos decimales
+import java.util.Locale;
 import cl.alkewallet.modelo.Cuenta;
 
 /**
  * Clase principal que ejecuta la aplicación de consola Alke Wallet.
- * Contiene el menú de interacción con el usuario.
- * * @author TuNombre
- * @version 1.0
+ * Ahora incluye la creación dinámica de usuario.
  */
 public class Ejecutable {
 
-    /**
-     * Método principal de entrada al programa.
-     * @param args Argumentos de línea de comandos (no utilizados).
-     */
     public static void main(String[] args) {
         // Configuramos Scanner para aceptar punto (.) como decimal
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
         
-        // Datos simulados (Mock data)
-        Cuenta miCuenta = new Cuenta("Estudiante Alkemy", 50000.0, 1001);
+        System.out.println("--- BIENVENIDO A LA CONFIGURACIÓN INICIAL ---");
+        
+        // 1. SOLICITAMOS LOS DATOS DEL USUARIO
+        System.out.print("Por favor, ingrese su nombre: ");
+        // Usamos next() para leer una palabra. Si quieres nombre y apellido usa scanner.next() + scanner.nextLine();
+        String nombreUsuario = scanner.next(); 
+        
+        System.out.print("Ingrese su número de cuenta deseado: ");
+        int numeroCuenta = 0;
+        if(scanner.hasNextInt()) {
+            numeroCuenta = scanner.nextInt();
+        } else {
+            scanner.next(); // Limpiar error
+            numeroCuenta = 123456; // Valor por defecto si fallan
+            System.out.println("Entrada inválida. Se asignó cuenta: " + numeroCuenta);
+        }
+
+        System.out.print("Ingrese su saldo inicial: ");
+        double saldoInicial = 0;
+        if(scanner.hasNextDouble()) {
+            saldoInicial = scanner.nextDouble();
+        } else {
+            scanner.next(); // Limpiar error
+            System.out.println("Entrada inválida. Iniciando en 0.0");
+        }
+
+        // 2. CREAMOS EL OBJETO (LA CUENTA) CON LOS DATOS INGRESADOS
+        Cuenta miCuenta = new Cuenta(nombreUsuario, saldoInicial, numeroCuenta);
+        
         int opcion = 0;
 
-        System.out.println("--------------------------------");
-        System.out.println("   BIENVENIDO A ALKE WALLET");
-        System.out.println("   Usuario: " + miCuenta.getTitular());
+        System.out.println("\n--------------------------------");
+        System.out.println("   HOLA, " + miCuenta.getTitular().toUpperCase());
+        System.out.println("   Tu cuenta #" + numeroCuenta + " está lista.");
         System.out.println("--------------------------------");
 
+        // 3. INICIO DEL MENÚ (IGUAL QUE ANTES)
         while (opcion != 5) {
             mostrarMenu();
             
-            // Validación para evitar que el programa falle si escriben letras
             if (scanner.hasNextInt()) {
                 opcion = scanner.nextInt();
                 procesarOpcion(opcion, scanner, miCuenta);
             } else {
                 System.out.println("Error: Por favor ingrese un número válido.");
-                scanner.next(); // Limpiar el buffer incorrecto
+                scanner.next(); 
             }
         }
         
         scanner.close();
     }
 
-    /**
-     * Muestra las opciones disponibles en consola.
-     */
     private static void mostrarMenu() {
-        System.out.println("\nSeleccione una operación:");
+        System.out.println("\n¿Qué deseas hacer?");
         System.out.println("1. Consultar saldo");
         System.out.println("2. Depositar fondos");
         System.out.println("3. Retirar fondos");
         System.out.println("4. Convertir moneda (Simulación USD)");
         System.out.println("5. Salir");
-        System.out.print("Su elección: ");
+        System.out.print("Elige una opción: ");
     }
 
-    /**
-     * Procesa la opción seleccionada por el usuario.
-     * * @param opcion El número de opción elegido.
-     * @param scanner El objeto Scanner para leer montos.
-     * @param cuenta La cuenta sobre la que se opera.
-     */
     private static void procesarOpcion(int opcion, Scanner scanner, Cuenta cuenta) {
         switch (opcion) {
             case 1:
-                System.out.println("Saldo actual: $" + cuenta.consultarSaldo());
+                System.out.println(">> Tu saldo actual es: $" + cuenta.consultarSaldo());
                 break;
             case 2:
                 System.out.print("Ingrese monto a depositar: ");
@@ -88,15 +100,14 @@ public class Ejecutable {
                 }
                 break;
             case 4:
-                // Tasa de cambio ejemplo: 1 peso = 0.0011 USD
                 double saldoUSD = cuenta.convertirMoneda(0.0011);
-                System.out.println("Su saldo en Dólares es aprox: US$" + saldoUSD);
+                System.out.println(">> Saldo aproximado en USD: $" + saldoUSD);
                 break;
             case 5:
-                System.out.println("Gracias por usar Alke Wallet. ¡Hasta pronto!");
+                System.out.println("Cerrando sesión... ¡Gracias por usar Alke Wallet!");
                 break;
             default:
-                System.out.println("Opción no reconocida, intente nuevamente.");
+                System.out.println("Opción no válida.");
         }
     }
 }
